@@ -1,12 +1,12 @@
 //@ts-ignore
 import { World, Component, System, enableRemoteDevtools } from 'ecsy'
-import { TestSystem } from './systems/TestSystem'
+import { RenderSystem } from './systems/RenderSystem'
 
 let world: World
 
 //todo type
 const components: any[] = []
-const systems: any[] = [TestSystem]
+const systems: any[] = [RenderSystem]
 let lastTime = performance.now()
 
 export const initEcsy = () => {

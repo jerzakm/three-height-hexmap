@@ -32,7 +32,6 @@ function noise(canvas: HTMLCanvasElement) {
 
       // Perlin.simplex2 and Perlin.perlin2 for 2d noise
       const value = Perlin.perlin2(x / 20, y / 20)
-      console.log(value)
       const c = (value + 1) * 120
       if (ctx) {
         ctx.fillStyle = `rgba(${c},${c},${c},1)`
