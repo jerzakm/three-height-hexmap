@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "ecsy": "^0.3.1",
+    "perlin.js": "^1.0.0",
     "stats.js": "^0.17.0",
     "three": "^0.117.1"
   }

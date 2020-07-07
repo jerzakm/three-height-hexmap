@@ -50,7 +50,7 @@ controls.addEventListener('change', render) // use if there is no animation loop
 controls.target.set(-1, 1, -0.5)
 controls.update()
 
-export const initScene = () => {
+export const initScene = (terrainCanvas: HTMLCanvasElement) => {
   document.body.appendChild(renderer.domElement)
   renderer.domElement.style.position = 'fixed'
 
@@ -58,11 +58,11 @@ export const initScene = () => {
 
   window.addEventListener('resize', onWindowResize, false)
   onWindowResize()
-  loadHex()
+  loadHex(terrainCanvas)
   render()
 }
 
-function loadHex() {
+function loadHex(terrainCanvas: HTMLCanvasElement) {
   objLoader.load('hexagon.obj', (group) => {
     const texture = textureLoader.load('hexagon.png')
     texture.magFilter = NearestFilter
@@ -71,20 +71,25 @@ function loadHex() {
       // map: texture,
       color: '#EEEFFF',
     })
-    console.log(group.children[0])
     //@ts-ignore
     group.children[0].material = material
     const hexagon = group.children[0]
 
-    for (let x = 0; x < 80; x++) {
-      for (let y = 0; y < 80; y++) {
-        const r = 1
-        const location = calcHexLocation(x, y, r, r * Math.sqrt(3), false)
-        const newHex = hexagon.clone()
-        newHex.castShadow = true
-        newHex.receiveShadow = true
-        newHex.position.set(location.x - 50, Math.random() * 2, location.y - 50)
-        scene.add(newHex)
+    const ctx = terrainCanvas.getContext('2d')
+
+    if (ctx) {
+      for (let x = 0; x < terrainCanvas.width; x++) {
+        for (let y = 0; y < terrainCanvas.height; y++) {
+          const height = ctx.getImageData(x, y, 1, 1).data[0] / 7 - 5
+
+          const r = 1
+          const location = calcHexLocation(x, y, r, r * Math.sqrt(3), false)
+          const newHex = hexagon.clone()
+          newHex.castShadow = true
+          newHex.receiveShadow = true
+          newHex.position.set(location.x - 50, height, location.y - 50)
+          scene.add(newHex)
+        }
       }
     }
 
