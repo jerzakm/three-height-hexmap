@@ -1,12 +1,13 @@
 //@ts-ignore
 import { World, Component, System, enableRemoteDevtools } from 'ecsy'
 import { RenderSystem } from './systems/RenderSystem'
+import { DayNightSystem } from './systems/DayNightSystem'
 
 let world: World
 
 //todo type
 const components: any[] = []
-const systems: any[] = [RenderSystem]
+const systems: any[] = [DayNightSystem, RenderSystem]
 let lastTime = performance.now()
 
 export const initEcsy = () => {

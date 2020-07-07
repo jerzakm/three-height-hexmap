@@ -1,7 +1,7 @@
 //@ts-ignore
 import { System } from 'ecsy'
 import { renderer, mainScene, camera } from '../three'
-import { Vector2, RepeatWrapping, TextureLoader } from 'three'
+import { Vector2, RepeatWrapping, TextureLoader, PCFSoftShadowMap } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -13,6 +13,7 @@ export class RenderSystem extends System {
   composer?: EffectComposer
   // This method will get called on every frame by default
   init() {
+    renderer.shadowMapType = PCFSoftShadowMap
     const composer = new EffectComposer(renderer)
     const renderPass = new RenderPass(mainScene, camera)
     composer.addPass(renderPass)
