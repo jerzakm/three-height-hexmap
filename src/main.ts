@@ -9,7 +9,7 @@ const app = new App({
   target: document.body,
 })
 
-const terrain = generateTerrain(120, 80)
+const terrain = generateTerrain(50, 50)
 initScene(terrain)
 initEcsy()
 
