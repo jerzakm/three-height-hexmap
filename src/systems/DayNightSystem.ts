@@ -76,7 +76,7 @@ export class DayNightSystem extends System {
   execute(delta: any, time: any) {
     const sunTravelRadius = 250
     this.queries.time.results.forEach((entity) => {
-      const dayProgress = entity.getComponent(TimeComponent).dayProgres
+      const dayProgress = entity.getComponent(TimeComponent).dayProgress
 
       const angle = degToRad(360 * dayProgress)
 
