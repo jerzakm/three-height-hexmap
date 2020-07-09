@@ -2,19 +2,29 @@
 import { World, Component, System, enableRemoteDevtools } from 'ecsy'
 import { RenderSystem } from './systems/RenderSystem'
 import { DayNightSystem } from './systems/DayNightSystem'
+import { WaterSystem } from './systems/WaterSystem'
+import { TimeComponent } from './components/TimeComponent'
+import { TimeSystem } from './systems/TimeSystem'
+// import * as ecsy from 'ecsy'
 
 let world: World
 
 //todo type
-const components: any[] = []
-const systems: any[] = [DayNightSystem, RenderSystem]
+const components: any[] = [TimeComponent]
+const systems: any[] = [TimeSystem, WaterSystem, DayNightSystem, RenderSystem]
 let lastTime = performance.now()
 
 export const initEcsy = () => {
   world = new World()
   registerAll()
   run()
-  // enableRemoteDevtools()
+  setupWorld()
+}
+
+function setupWorld() {
+  // 1. Time entity
+  const clock = world.createEntity()
+  clock.addComponent(TimeComponent)
 }
 
 function registerAll() {

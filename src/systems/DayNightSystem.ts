@@ -10,9 +10,10 @@ import {
 } from 'three'
 import { mainScene } from '../three'
 import { degToRad } from '../util/math'
+import { TimeComponent } from '../components/TimeComponent'
 
 const sunTravel = true
-const sunSpeed = 0.0001
+const sunSpeed = 0.00001
 
 export class DayNightSystem extends System {
   // This method will get called on every frame by default
@@ -68,38 +69,38 @@ export class DayNightSystem extends System {
 
     this.sunPosition = {
       progress: 0,
-      radius: 150,
+      radius: 250,
     }
   }
 
   execute(delta: any, time: any) {
-    if (this.sun && this.sunPosition && this.hemi && this.ambient) {
-      if (sunTravel) {
-        const angle = degToRad(360 * this.sunPosition.progress)
+    const sunTravelRadius = 250
+    this.queries.time.results.forEach((entity) => {
+      const dayProgress = entity.getComponent(TimeComponent).dayProgres
 
-        const x = Math.cos(angle) * this.sunPosition.radius
-        const y = Math.sin(angle) * this.sunPosition.radius
+      const angle = degToRad(360 * dayProgress)
 
-        // Sun rises up
-        if (this.sunPosition.progress > 0 && this.sunPosition.progress < 0.5) {
-          if (this.sunPosition.progress < 0.25) {
-            // sun brigthens up
-            this.ambient.intensity += delta * sunSpeed * 2
-          } else {
-            // sun dims
-            this.ambient.intensity -= delta * sunSpeed * 2
-          }
-        } else {
-          // reset to 0 - night
-          this.ambient.intensity = 0
-        }
+      const x = Math.cos(angle) * sunTravelRadius
+      const y = Math.sin(angle) * sunTravelRadius
 
-        this.sunPosition.progress > 1
-          ? (this.sunPosition.progress = 0)
-          : (this.sunPosition.progress += delta * sunSpeed)
-
-        this.sun.position.set(x, y, 80)
+      // Sun rises up
+      if (!this.ambient || !this.sun) {
+        return
       }
+      if (dayProgress > 0 && dayProgress < 0.5) {
+        if (dayProgress < 0.25) {
+          // sun brigthens up
+          this.ambient.intensity += delta * sunSpeed * 2
+        } else {
+          // sun dims
+          this.ambient.intensity -= delta * sunSpeed * 2
+        }
+      } else {
+        // reset to 0 - night
+        this.ambient.intensity = 0
+      }
+
+      this.sun.position.set(x, y, 150)
 
       if (this.sunHelper) {
         this.sunHelper.position.set(
@@ -108,6 +109,10 @@ export class DayNightSystem extends System {
           this.sun.position.z
         )
       }
-    }
+    })
   }
+}
+
+DayNightSystem.queries = {
+  time: { components: [TimeComponent] },
 }
