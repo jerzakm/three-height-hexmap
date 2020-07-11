@@ -6,8 +6,9 @@ import { WaterSystem } from './systems/WaterSystem'
 import { TimeComponent } from './components/TimeComponent'
 import { TimeSystem } from './systems/TimeSystem'
 import { Position3 } from './components/basic/Position3'
+import { SunTag, SceneAdd, SceneRemove } from './components/basic/TagComponents'
+import { SceneManagerSystem } from './systems/SceneManagerSystem'
 import { DirectionalLightComponent } from './components/basic/DirectionalLight'
-import { SunTag } from './components/basic/TagComponents'
 
 export let world: World
 
@@ -17,12 +18,15 @@ export const componentsList: any[] = [
   Position3,
   DirectionalLightComponent,
   SunTag,
+  SceneAdd,
+  SceneRemove,
 ]
 export const systems: any[] = [
   TimeSystem,
   WaterSystem,
   DayNightSystem,
   RenderSystem,
+  SceneManagerSystem,
 ]
 let lastTime = performance.now()
 

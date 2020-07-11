@@ -1,4 +1,4 @@
-import { Vector3, DirectionalLight } from 'three'
+import { Vector3, DirectionalLight, Object3D } from 'three'
 import { createType, copyCopyable, cloneClonable } from 'ecsy'
 
 export const ThreeTypes = {
@@ -9,7 +9,7 @@ export const ThreeTypes = {
     clone: cloneClonable,
   }),
   DirectionalLight: createType({
-    name: 'DirectionalLight',
+    name: 'Object3D',
     default: new DirectionalLight(),
     copy: copyCopyable,
     clone: cloneClonable,
