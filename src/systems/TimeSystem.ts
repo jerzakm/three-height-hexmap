@@ -8,7 +8,7 @@ export class TimeSystem extends System {
   execute(delta: any, time: any) {
     this.queries.time.results.forEach((entity) => {
       const time = entity.getMutableComponent(TimeComponent)
-      console.log(time)
+
       // day cycle progress 0 to 1
       time.dayProgress += delta * 0.00001 * time.speed
       time.dayProgress >= 1 ? (time.dayProgress = 0) : ''

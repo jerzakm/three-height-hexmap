@@ -1,17 +1,29 @@
 //@ts-ignore
-import { World, Component, System, enableRemoteDevtools } from 'ecsy'
+import { World } from 'ecsy'
 import { RenderSystem } from './systems/RenderSystem'
 import { DayNightSystem } from './systems/DayNightSystem'
 import { WaterSystem } from './systems/WaterSystem'
 import { TimeComponent } from './components/TimeComponent'
 import { TimeSystem } from './systems/TimeSystem'
-// import * as ecsy from 'ecsy'
+import { Position3 } from './components/basic/Position3'
+import { DirectionalLightComponent } from './components/basic/DirectionalLight'
+import { SunTag } from './components/basic/TagComponents'
 
-let world: World
+export let world: World
 
 //todo type
-const components: any[] = [TimeComponent]
-const systems: any[] = [TimeSystem, WaterSystem, DayNightSystem, RenderSystem]
+export const componentsList: any[] = [
+  TimeComponent,
+  Position3,
+  DirectionalLightComponent,
+  SunTag,
+]
+export const systems: any[] = [
+  TimeSystem,
+  WaterSystem,
+  DayNightSystem,
+  RenderSystem,
+]
 let lastTime = performance.now()
 
 export const initEcsy = () => {
@@ -28,7 +40,7 @@ function setupWorld() {
 }
 
 function registerAll() {
-  for (const component of components) {
+  for (const component of componentsList) {
     world.registerComponent(component)
   }
   for (const system of systems) {
