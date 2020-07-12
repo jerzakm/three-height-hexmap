@@ -72,13 +72,8 @@ function loadHex(terrainCanvas: HTMLCanvasElement) {
             newHex.receiveShadow = true
             newHex.position.set(location.x - 50, height - 5, location.y - 50)
 
-            const t3t = textureLoader.load('threeTone.jpg')
-
-            const material = new MeshToonMaterial({
+            const material = new MeshPhongMaterial({
               color: '#FFFFFF',
-              gradientMap: t3t,
-
-              // map: texture,
             })
             //@ts-ignore
             newHex.material = material

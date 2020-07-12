@@ -19,11 +19,11 @@ const fragmentShader = `
 
 // 0 = No antialiasing
 // 1 = 2x2 supersampling antialiasing
-#define ANTIALIAS 0
+#define ANTIALIAS 2
 
 // 0 = Static camera
 // 1 = Animate the camera
-#define ANIMATE_CAM 1
+#define ANIMATE_CAM 0
 
 // 0 = Do not distort the water texture
 // 1 = Apply lateral distortion to the water texture
@@ -35,7 +35,7 @@ const fragmentShader = `
 
 // 0 = Antialias the water texture
 // 1 = Do not antialias the water texture
-#define FAST_CIRCLES 1
+#define FAST_CIRCLES 0
 
 //-----------------------------------------------------------------------------
 
@@ -267,12 +267,11 @@ export class WaterSystem extends System {
     waterMesh.receiveShadow = true
     waterMesh.rotateX(degToRad(-90))
     mainScene.add(waterMesh)
-    console.log(camera.quaternion)
   }
 
   execute(delta: any, time: any) {
     uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1)
-    uniforms.iTime.value = time * 0.001
+    uniforms.iTime.value = time * 0.0005
     uniforms.cpos.value.set(
       camera.position.x,
       camera.position.y,
