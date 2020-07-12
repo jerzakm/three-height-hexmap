@@ -7,14 +7,20 @@ import {
   MeshPhongMaterial,
   NearestFilter,
   RepeatWrapping,
+  GammaEncoding,
+  MeshToonMaterial,
 } from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { calcHexLocation } from './hexGrid/hexMath'
 
-export const renderer = new WebGLRenderer({ antialias: true, alpha: true })
+export const renderer = new WebGLRenderer({ antialias: true })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = BasicShadowMap
+// @ts-ignore
+renderer.outputEncoding = GammaEncoding
+renderer.setPixelRatio(window.devicePixelRatio)
+renderer.setSize(window.innerWidth, window.innerHeight)
 
 export const mainScene = new Scene()
 
@@ -66,8 +72,12 @@ function loadHex(terrainCanvas: HTMLCanvasElement) {
             newHex.receiveShadow = true
             newHex.position.set(location.x - 50, height - 5, location.y - 50)
 
-            const material = new MeshPhongMaterial({
+            const t3t = textureLoader.load('threeTone.jpg')
+
+            const material = new MeshToonMaterial({
               color: '#FFFFFF',
+              gradientMap: t3t,
+
               // map: texture,
             })
             //@ts-ignore

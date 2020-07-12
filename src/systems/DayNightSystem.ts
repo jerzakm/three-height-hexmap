@@ -103,8 +103,6 @@ export class DayNightSystem extends System {
 
       const sunLight = sun.getMutableComponent(DirectionalLightComponent)
 
-      console.log(sunLight.value)
-
       sunLight.value.position.x = sunPosition.value.x
 
       sunLight.value.position.set(
