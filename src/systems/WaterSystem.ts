@@ -3,14 +3,12 @@ import { renderer, mainScene, camera } from '../three'
 import {
   PlaneBufferGeometry,
   Mesh,
-  MeshPhongMaterial,
-  DoubleSide,
   Vector3,
   ShaderMaterial,
   Vector4,
 } from 'three'
 import { degToRad } from '../util/math'
-
+// TODO optimize shader
 const fragmentShader = `
 #include <common>
 
@@ -255,21 +253,20 @@ export class WaterSystem extends System {
   // This method will get called on every frame by default
   init() {
     const plane = new PlaneBufferGeometry(200, 200)
-    // const material = new MeshPhongMaterial({
-    //   color: '#225599',
-    //   side: DoubleSide,
-    // })
     const material = new ShaderMaterial({
       fragmentShader,
       uniforms,
     })
     const waterMesh = new Mesh(plane, material)
+    // waterMesh.position.set(0, -10, 0)
     waterMesh.receiveShadow = true
     waterMesh.rotateX(degToRad(-90))
-    mainScene.add(waterMesh)
+    // mainScene.add(waterMesh)
   }
 
   execute(delta: any, time: any) {
+    //TODO water receive shadows
+    //TODO water reacts to time of day
     uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1)
     uniforms.iTime.value = time * 0.0005
     uniforms.cpos.value.set(

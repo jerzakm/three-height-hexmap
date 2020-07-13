@@ -1,5 +1,17 @@
 //@ts-ignore
 import Perlin from 'perlin.js'
+import { inverseLerp } from './util/math'
+import { Vector2 } from 'three'
+
+const regions: TerrainType[] = []
+regions.push({ name: 'water', height: 0.4, colour: '#1133AA' })
+regions.push({ name: 'land', height: 1, colour: '#44AA11' })
+
+interface TerrainType {
+  name: string
+  height: number
+  colour: string
+}
 
 export const generateTerrain = (width: number, height: number) => {
   const canvas = document.createElement('canvas')
@@ -12,12 +24,13 @@ export const generateTerrain = (width: number, height: number) => {
 
   document.body.appendChild(canvas)
 
-  noise(canvas)
+  const terrain = generate(canvas)
 
   return canvas
 }
 
-function noise(canvas: HTMLCanvasElement) {
+function generate(canvas: HTMLCanvasElement) {
+  // todo change for predictable seed..
   Perlin.seed(Math.random())
 
   const ctx = canvas.getContext('2d')
@@ -26,20 +39,98 @@ function noise(canvas: HTMLCanvasElement) {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  for (var x = 0; x < canvas.width; x++) {
-    for (var y = 0; y < canvas.height; y++) {
+  let scale = 20
+
+  if (scale <= 0) {
+    scale = 1
+  }
+
+  const octaves = 4
+  const offsetX = 0
+  const offsetY = 0
+
+  const octaveOffsets: Vector2[] = []
+  for (let i = 0; i < octaves; i++) {
+    // todo better randomness => seeded
+    const oX = (Math.random() - 0.5) * 20000 + offsetX
+    const oY = (Math.random() - 0.5) * 20000 + offsetY
+    octaveOffsets[i] = new Vector2(oX, oY)
+  }
+
+  const persistance = 0.5
+  const lacunarity = 2
+
+  let maxNoiseHeight = Number.MIN_SAFE_INTEGER
+  let minNoiseHeight = Number.MAX_SAFE_INTEGER
+
+  const noiseMap: number[][] = new Array(canvas.width)
+    .fill(0)
+    .map(() => new Array(canvas.height).fill(0))
+
+  const colorMap: string[][] = new Array(canvas.width)
+    .fill(0)
+    .map(() => new Array(canvas.height).fill(0))
+
+  // Initial perlin noise
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
       // All Perlin functions return values in the range of -1 to 1.
 
-      // Perlin.simplex2 and Perlin.perlin2 for 2d noise
-      const value = Perlin.perlin2(x / 20, y / 20)
-      const c = (value + 1) * 120
-      if (ctx) {
-        ctx.fillStyle = `rgba(${c},${c},${c},1)`
-        ctx.fillRect(x, y, 1, 1)
+      let amplitude = 1
+      let frequency = 1
+      let noiseHeight = 0
+
+      for (let i = 0; i < octaves; i++) {
+        const sampleX = (x / scale) * frequency + octaveOffsets[i].x
+        const sampleY = (y / scale) * frequency + octaveOffsets[i].y
+
+        const perlinValue = Perlin.perlin2(sampleX, sampleY) * 2 - 1
+        noiseHeight += perlinValue * amplitude
+
+        amplitude *= persistance
+        frequency *= lacunarity
       }
+      noiseMap[x][y] = noiseHeight
+
+      if (noiseHeight > maxNoiseHeight) {
+        maxNoiseHeight = noiseHeight
+      } else if (noiseHeight < minNoiseHeight) {
+        minNoiseHeight = noiseHeight
+      }
+
       // ... or Perlin.simplex3 and Perlin.perlin3:
       // var value = Perlin.simplex3(x / 100, y / 100, time);
       // image[x][y].r = Math.abs(value) * 256; // Or whatever. Open demo.html to see it used with canvas.
     }
   }
+
+  // Perlin inverse lerp smoothing
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
+      noiseMap[x][y] = inverseLerp(
+        minNoiseHeight,
+        maxNoiseHeight,
+        noiseMap[x][y]
+      )
+      const c = noiseMap[x][y] * 120
+      if (ctx) {
+        ctx.fillStyle = `rgba(${c},${c},${c},1)`
+        ctx.fillRect(x, y, 1, 1)
+      }
+    }
+  }
+
+  //Color map generation
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
+      const currentHeight = noiseMap[x][y]
+      for (let i = 0; i < regions.length; i++) {
+        if (currentHeight <= regions[i].height) {
+          colorMap[x][y] = regions[i].colour
+        }
+      }
+    }
+  }
+
+  return { noiseMap, colorMap }
 }

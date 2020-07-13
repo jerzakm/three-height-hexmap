@@ -64,22 +64,22 @@ function loadHex(terrainCanvas: HTMLCanvasElement) {
         for (let y = 0; y < terrainCanvas.height; y++) {
           const height = ctx.getImageData(x, y, 1, 1).data[0] / 7 - 18
 
-          if (height > 0) {
-            const r = 1
-            const location = calcHexLocation(x, y, r, r * Math.sqrt(3), false)
-            const newHex = hexagon.clone()
-            newHex.castShadow = true
-            newHex.receiveShadow = true
-            newHex.position.set(location.x - 50, height - 5, location.y - 50)
+          // if (height > 0) {
+          const r = 1
+          const location = calcHexLocation(x, y, r, r * Math.sqrt(3), false)
+          const newHex = hexagon.clone()
+          newHex.castShadow = true
+          newHex.receiveShadow = true
+          newHex.position.set(location.x - 50, height - 5, location.y - 50)
 
-            const material = new MeshPhongMaterial({
-              color: '#FFFFFF',
-            })
-            //@ts-ignore
-            newHex.material = material
+          const material = new MeshPhongMaterial({
+            color: '#FFFFFF',
+          })
+          //@ts-ignore
+          newHex.material = material
 
-            mainScene.add(newHex)
-          }
+          mainScene.add(newHex)
+          // }
         }
       }
     }
