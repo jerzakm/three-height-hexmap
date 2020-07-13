@@ -9,8 +9,8 @@ const app = new App({
   target: document.body,
 })
 
-const terrain = generateTerrain(120, 80)
-initScene(terrain)
+const terrain = generateTerrain(20, 20)
+initScene()
 initEcsy()
 
 export default app

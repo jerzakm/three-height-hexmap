@@ -41,13 +41,13 @@ const controls = new OrbitControls(camera, renderer.domElement)
 controls.target.set(-1, 1, -0.5)
 controls.update()
 
-export const initScene = (terrainCanvas: HTMLCanvasElement) => {
+export const initScene = () => {
   document.body.appendChild(renderer.domElement)
   renderer.domElement.style.position = 'fixed'
 
   window.addEventListener('resize', onWindowResize, false)
   onWindowResize()
-  loadHex(terrainCanvas)
+  // loadHex(terrainCanvas)
 }
 
 function loadHex(terrainCanvas: HTMLCanvasElement) {

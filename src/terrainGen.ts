@@ -26,7 +26,7 @@ export const generateTerrain = (width: number, height: number) => {
 
   const terrain = generate(canvas)
 
-  return canvas
+  return terrain
 }
 
 function generate(canvas: HTMLCanvasElement) {

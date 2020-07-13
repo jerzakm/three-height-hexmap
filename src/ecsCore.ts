@@ -6,20 +6,33 @@ import { WaterSystem } from './systems/WaterSystem'
 import { TimeComponent } from './components/TimeComponent'
 import { TimeSystem } from './systems/TimeSystem'
 import { Position3 } from './components/basic/Position3'
-import { SunTag, SceneAdd, SceneRemove } from './components/basic/TagComponents'
+import {
+  SunTag,
+  SceneAdd,
+  SceneRemove,
+  HexTile,
+} from './components/basic/TagComponents'
 import { SceneManagerSystem } from './systems/SceneManagerSystem'
 import { DirectionalLightComponent } from './components/basic/DirectionalLight'
+import { MeshComponent } from './components/basic/MeshComponent'
+import { TerrainSystem } from './systems/TerrainSystem'
+import { Position2 } from './components/basic/Position2'
+import { Color } from './components/basic/Color'
 
 export let world: World
 
 //todo type
 export const componentsList: any[] = [
   TimeComponent,
+  Position2,
   Position3,
   DirectionalLightComponent,
   SunTag,
   SceneAdd,
   SceneRemove,
+  Color,
+  HexTile,
+  MeshComponent,
 ]
 export const systems: any[] = [
   TimeSystem,
@@ -27,6 +40,7 @@ export const systems: any[] = [
   DayNightSystem,
   RenderSystem,
   SceneManagerSystem,
+  TerrainSystem,
 ]
 let lastTime = performance.now()
 
