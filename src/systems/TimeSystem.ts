@@ -1,5 +1,6 @@
 import { System } from 'ecsy'
 import { TimeComponent } from '../components/TimeComponent'
+import { timeStore } from '../gui/stores'
 
 export class TimeSystem extends System {
   // This method will get called on every frame by default
@@ -17,12 +18,22 @@ export class TimeSystem extends System {
       // todo optimize math
       const daySecondsTotal = 24 * 60 * 60
 
+      const adjustedProgress = time.dayProgress + 0.3
+
       const seconds = (daySecondsTotal * time.dayProgress) % 60
       const minutes = ((daySecondsTotal * time.dayProgress) / 60) % 60
-      const hours = Math.floor((daySecondsTotal * time.dayProgress) / 3600)
-      time.hour = hours
+      const hours = Math.floor((daySecondsTotal * adjustedProgress) / 3600)
+      time.hour = hours > 24 ? hours - 24 : hours
       time.minute = minutes
       time.second = seconds
+
+      timeStore.set({
+        dayProgress: time.dayProgress,
+        hour: time.hour,
+        minute: time.minute,
+        second: time.second,
+        speed: time.speed,
+      })
     })
   }
 }
