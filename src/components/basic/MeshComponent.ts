@@ -1,9 +1,9 @@
 import { Component, Types } from 'ecsy'
 import { ThreeTypes } from '../../types/threeTypes'
-import { Mesh } from 'three'
+import { Object3D } from 'three'
 
-export class MeshComponent extends Component<any> {
-  value!: Mesh
+export class Object3DComponent extends Component<any> {
+  value!: Object3D
   static schema = {
     value: { type: Types.Ref },
   }

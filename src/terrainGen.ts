@@ -4,8 +4,14 @@ import { inverseLerp } from './util/math'
 import { Vector2 } from 'three'
 
 const regions: TerrainType[] = []
-regions.push({ name: 'water', height: 0.4, colour: '#1133AA' })
-regions.push({ name: 'land', height: 1, colour: '#44AA11' })
+regions.push({ name: 'water', height: 0.3, colour: '#1133AA' })
+regions.push({ name: 'waterShallow', height: 0.35, colour: '#2255BB' })
+regions.push({ name: 'sand', height: 0.42, colour: '#CCDD22' })
+regions.push({ name: 'grass', height: 0.55, colour: '#44BC11' })
+regions.push({ name: 'grass2', height: 0.6, colour: '#44DC11' })
+regions.push({ name: 'rock', height: 0.85, colour: '#559911' })
+regions.push({ name: 'rock2', height: 0.95, colour: '#342111' })
+regions.push({ name: 'mountain', height: 1, colour: '#EEEEEE' })
 
 interface TerrainType {
   name: string
@@ -127,6 +133,7 @@ function generate(canvas: HTMLCanvasElement) {
       for (let i = 0; i < regions.length; i++) {
         if (currentHeight <= regions[i].height) {
           colorMap[x][y] = regions[i].colour
+          break
         }
       }
     }

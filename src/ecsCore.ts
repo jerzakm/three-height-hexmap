@@ -14,10 +14,12 @@ import {
 } from './components/basic/TagComponents'
 import { SceneManagerSystem } from './systems/SceneManagerSystem'
 import { DirectionalLightComponent } from './components/basic/DirectionalLight'
-import { MeshComponent } from './components/basic/MeshComponent'
+import { Object3DComponent } from './components/basic/MeshComponent'
 import { TerrainSystem } from './systems/TerrainSystem'
 import { Position2 } from './components/basic/Position2'
 import { Color } from './components/basic/Color'
+import { TranslateSystem } from './systems/TranslateSystem'
+import { TranslateComponent } from './components/TranslateComponent'
 
 export let world: World
 
@@ -32,7 +34,8 @@ export const componentsList: any[] = [
   SceneRemove,
   Color,
   HexTile,
-  MeshComponent,
+  Object3DComponent,
+  TranslateComponent,
 ]
 export const systems: any[] = [
   TimeSystem,
@@ -41,6 +44,7 @@ export const systems: any[] = [
   RenderSystem,
   SceneManagerSystem,
   TerrainSystem,
+  TranslateSystem,
 ]
 let lastTime = performance.now()
 
