@@ -1,6 +1,6 @@
 //@ts-ignore
 import { System } from 'ecsy'
-import { renderer, mainScene, camera } from '../three'
+import { renderer, mainScene, camera } from '../../three'
 import { Vector2, RepeatWrapping, TextureLoader, PCFSoftShadowMap } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'

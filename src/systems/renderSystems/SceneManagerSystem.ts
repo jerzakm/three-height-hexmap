@@ -1,7 +1,7 @@
 import { System } from 'ecsy'
-import { SceneAdd, SceneRemove } from '../components/basic/TagComponents'
-import { mainScene } from '../three'
-import { DirectionalLightComponent } from '../components/basic/DirectionalLight'
+import { SceneAdd, SceneRemove } from '../../components/basic/TagComponents'
+import { mainScene } from '../../three'
+import { DirectionalLightComponent } from '../../components/basic/DirectionalLight'
 
 export class SceneManagerSystem extends System {
   init() {}
