@@ -1,6 +1,6 @@
 //@ts-ignore
 import { World } from 'ecsy'
-import { RenderSystem } from './systems/RenderSystem'
+import { RenderSystem } from './systems/renderSystems/RenderSystem'
 import { DayNightSystem } from './systems/DayNightSystem'
 import { WaterSystem } from './systems/WaterSystem'
 import { TimeComponent } from './components/TimeComponent'
@@ -12,13 +12,13 @@ import {
   SceneRemove,
   HexTile,
 } from './components/basic/TagComponents'
-import { SceneManagerSystem } from './systems/SceneManagerSystem'
+import { SceneManagerSystem } from './systems/renderSystems/SceneManagerSystem'
 import { DirectionalLightComponent } from './components/basic/DirectionalLight'
 import { Object3DComponent } from './components/basic/MeshComponent'
 import { TerrainSystem } from './systems/TerrainSystem'
 import { Position2 } from './components/basic/Position2'
 import { Color } from './components/basic/Color'
-import { TranslateSystem } from './systems/TranslateSystem'
+import { TranslateSystem } from './systems/renderSystems/TranslateSystem'
 import { TranslateComponent } from './components/TranslateComponent'
 
 export let world: World
@@ -58,7 +58,7 @@ export const initEcsy = () => {
 function setupWorld() {
   // 1. Time entity
   const clock = world.createEntity()
-  clock.addComponent(TimeComponent)
+  clock.addComponent(TimeComponent, { speed: 1 })
 }
 
 function registerAll() {

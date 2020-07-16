@@ -20,30 +20,8 @@ interface TerrainType {
 }
 
 export const generateTerrain = (width: number, height: number) => {
-  const canvas = document.createElement('canvas')
-
-  canvas.width = width
-  canvas.height = height
-
-  canvas.style.position = 'fixed'
-  canvas.style.zIndex = '10'
-
-  document.body.appendChild(canvas)
-
-  const terrain = generate(canvas)
-
-  return terrain
-}
-
-function generate(canvas: HTMLCanvasElement) {
   // todo change for predictable seed..
   Perlin.seed(Math.random())
-
-  const ctx = canvas.getContext('2d')
-  if (ctx) {
-    ctx.fillStyle = 'rgb(0,0,0)'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-  }
 
   let scale = 20
 
@@ -69,17 +47,17 @@ function generate(canvas: HTMLCanvasElement) {
   let maxNoiseHeight = Number.MIN_SAFE_INTEGER
   let minNoiseHeight = Number.MAX_SAFE_INTEGER
 
-  const noiseMap: number[][] = new Array(canvas.width)
+  const noiseMap: number[][] = new Array(width)
     .fill(0)
-    .map(() => new Array(canvas.height).fill(0))
+    .map(() => new Array(height).fill(0))
 
-  const colorMap: string[][] = new Array(canvas.width)
+  const colorMap: string[][] = new Array(width)
     .fill(0)
-    .map(() => new Array(canvas.height).fill(0))
+    .map(() => new Array(height).fill(0))
 
   // Initial perlin noise
-  for (let x = 0; x < canvas.width; x++) {
-    for (let y = 0; y < canvas.height; y++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
       // All Perlin functions return values in the range of -1 to 1.
 
       let amplitude = 1
@@ -111,24 +89,19 @@ function generate(canvas: HTMLCanvasElement) {
   }
 
   // Perlin inverse lerp smoothing
-  for (let x = 0; x < canvas.width; x++) {
-    for (let y = 0; y < canvas.height; y++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
       noiseMap[x][y] = inverseLerp(
         minNoiseHeight,
         maxNoiseHeight,
         noiseMap[x][y]
       )
-      const c = noiseMap[x][y] * 120
-      if (ctx) {
-        ctx.fillStyle = `rgba(${c},${c},${c},1)`
-        ctx.fillRect(x, y, 1, 1)
-      }
     }
   }
 
   //Color map generation
-  for (let x = 0; x < canvas.width; x++) {
-    for (let y = 0; y < canvas.height; y++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
       const currentHeight = noiseMap[x][y]
       for (let i = 0; i < regions.length; i++) {
         if (currentHeight <= regions[i].height) {

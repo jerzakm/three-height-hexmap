@@ -70,7 +70,7 @@ export class DayNightSystem extends System {
   }
 
   execute(delta: any, time: any) {
-    const sunTravelRadius = 250
+    const sunTravelRadius = 150
 
     const sun = this.queries.sun.results[0]
 
