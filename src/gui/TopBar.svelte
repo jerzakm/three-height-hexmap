@@ -9,15 +9,14 @@
 </script>
 
 <style>
-  .time {
-    position: fixed;
-    z-index: 5;
-    padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.171);
-  }
+
 </style>
 
-<div class="time">
-  <span>Time:</span>
-  <h3>{time.hour}:{time.minute.toFixed(0)}</h3>
-</div>
+<topbar class="fixed p-2 z-10 bg-gray-900 w-full flex flex-col items-start">
+  <clock class="flex flex-col items-center">
+    <span class="text-sm">World time:</span>
+    <h3>
+      {time.hour < 10 ? `0${time.hour}` : time.hour}:{time.minute - 1 < 10 ? `0${time.minute.toFixed(0)}` : time.minute.toFixed(0)}
+    </h3>
+  </clock>
+</topbar>
