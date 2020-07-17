@@ -1,6 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebPackPlugin = require("html-webpack-plugin")
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const path = require('path');
 
@@ -65,7 +66,17 @@ module.exports = {
                 ]
               }
             }
-          }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: 'postcss',
+              plugins: [
+                require('tailwindcss'),
+                require('autoprefixer'),
+              ],
+            },
+          },
         ]
       },
       {
