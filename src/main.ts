@@ -9,7 +9,11 @@ const app = new App({
   target: document.body,
 })
 
-const terrain = generateTerrain(20, 20)
+export const worldSettings = {
+  width: 64,
+  height: 64,
+}
+
 initScene()
 initEcsy()
 
