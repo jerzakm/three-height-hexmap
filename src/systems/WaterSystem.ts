@@ -6,8 +6,11 @@ import {
   Vector3,
   ShaderMaterial,
   Vector4,
+  UniformsUtils,
+  UniformsLib,
 } from 'three'
 import { degToRad } from '../util/math'
+import { worldSettings } from '../main'
 // TODO optimize shader
 const fragmentShader = `
 #include <common>
@@ -252,16 +255,23 @@ const uniforms = {
 export class WaterSystem extends System {
   // This method will get called on every frame by default
   init() {
-    const plane = new PlaneBufferGeometry(200, 200)
+    const plane = new PlaneBufferGeometry(
+      worldSettings.width * Math.sqrt(3) + 4,
+      worldSettings.height * 1.5 + 4
+    )
     const material = new ShaderMaterial({
       fragmentShader,
       uniforms,
     })
     const waterMesh = new Mesh(plane, material)
-    // waterMesh.position.set(0, -10, 0)
     waterMesh.receiveShadow = true
     waterMesh.rotateX(degToRad(-90))
-    // mainScene.add(waterMesh)
+    waterMesh.position.set(
+      (worldSettings.width * Math.sqrt(3)) / 2 - 2,
+      0,
+      (worldSettings.height * 1.5) / 2 - 2
+    )
+    mainScene.add(waterMesh)
   }
 
   execute(delta: any, time: any) {
