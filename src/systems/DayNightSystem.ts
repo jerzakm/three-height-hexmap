@@ -8,6 +8,7 @@ import {
   AmbientLight,
   DirectionalLight,
   Vector3,
+  Color,
 } from 'three'
 import { mainScene } from '../three'
 import { degToRad } from '../util/math'
@@ -26,7 +27,7 @@ export class DayNightSystem extends System {
 
   init() {
     // configure sun light
-    const sunLight = new DirectionalLight(0xffffcc, 0.2)
+    const sunLight = new DirectionalLight(0xffffcc, 0.25)
 
     sunLight.name = 'dirlight'
     sunLight.position.set(-1, 0.75, 1)
@@ -58,10 +59,10 @@ export class DayNightSystem extends System {
     mainScene.add(hemiLight)
     this.hemi = hemiLight
 
-    const ambientLight = new AmbientLight('#FFFFFF', 0.3)
+    const ambientLight = new AmbientLight('#FFFFFF', 0.1)
     this.ambient = ambientLight
 
-    mainScene.add(ambientLight)
+    // mainScene.add(ambientLight)
 
     const geometry = new SphereGeometry(2)
     const material = new MeshBasicMaterial({ color: '#CCCC00' })
@@ -82,11 +83,24 @@ export class DayNightSystem extends System {
       const x = Math.cos(angle) * sunTravelRadius
       const y = Math.sin(angle) * sunTravelRadius
 
+      const sunPosition = sun.getMutableComponent(Position3)
+      sunPosition.value.set(x, y, 150)
+      const sunLight = sun.getMutableComponent(DirectionalLightComponent)
+
       if (dayProgress > 0 && dayProgress < 0.5) {
         if (dayProgress < 0.25) {
           // sun brigthens up
           // @ts-ignore
           this.ambient.intensity += delta * sunSpeed * 2
+
+          // sun is red in the morning
+          sunLight.value.intensity = dayProgress + 0.35
+          sunLight.value.color = new Color(
+            `rgb(255,${(255 * (dayProgress + 0.4)).toFixed(0)},${(
+              255 * dayProgress +
+              0.4
+            ).toFixed(0)})`
+          )
         } else {
           // sun dims
           // @ts-ignore
@@ -95,13 +109,8 @@ export class DayNightSystem extends System {
       } else {
         // reset to 0 - night
         // @ts-ignore
-        this.ambient.intensity = 0
+        this.ambient.intensity = 0.005
       }
-
-      const sunPosition = sun.getMutableComponent(Position3)
-      sunPosition.value.set(x, y, 150)
-
-      const sunLight = sun.getMutableComponent(DirectionalLightComponent)
 
       sunLight.value.position.x = sunPosition.value.x
 

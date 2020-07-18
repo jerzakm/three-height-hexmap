@@ -1,17 +1,27 @@
 import { System } from 'ecsy'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { Mesh, MeshPhongMaterial, Vector2 } from 'three'
+import {
+  Mesh,
+  MeshPhongMaterial,
+  Vector2,
+  Frustum,
+  Matrix4,
+  Vector3,
+} from 'three'
 import { generateTerrain } from '../terrainGen'
 import { Position2 } from '../components/basic/Position2'
 import { Color } from '../components/basic/Color'
 import { HexTile } from '../components/basic/TagComponents'
 import { Object3DComponent } from '../components/basic/MeshComponent'
-import { mainScene } from '../three'
+import { mainScene, camera } from '../three'
 import { calcHexLocation } from '../hexGrid/hexMath'
 import { TranslateComponent } from '../components/TranslateComponent'
+import { worldSettings } from '../main'
 
 const r = 1
 const h = 1 * Math.sqrt(3)
+
+let counter = 0
 
 export class TerrainSystem extends System {
   hexModel!: Mesh
@@ -27,7 +37,10 @@ export class TerrainSystem extends System {
     })
 
     //Temporary generation here TODO move outside of terrain system
-    const { noiseMap, colorMap } = generateTerrain(60, 60)
+    const { noiseMap, colorMap } = generateTerrain(
+      worldSettings.width,
+      worldSettings.height
+    )
     this.colorMap = colorMap
     this.noiseMap = noiseMap
 
@@ -43,12 +56,15 @@ export class TerrainSystem extends System {
 
   execute(delta: any, time: any) {
     // Tile gets added for the first time
-    for (let i = 0; i < this.queries.tileAdd.results.length; i++) {
-      const hexEntity = this.queries.tileAdd.results[i]
+    // camera.updateMatrix()
+    // camera.updateMatrixWorld()
+    counter++
+    for (let i = 0; i < this.queries.hexTiles.results.length; i++) {
+      const hexEntity = this.queries.hexTiles.results[i]
       const mesh = hexEntity.getComponent(Object3DComponent)
-      const hexGridPos = hexEntity.getComponent(Position2).value
 
       if (!mesh && this.hexModel) {
+        const hexGridPos = hexEntity.getComponent(Position2).value
         const color = hexEntity.getComponent(Color).value
 
         let material
@@ -76,7 +92,7 @@ export class TerrainSystem extends System {
         hexMesh.receiveShadow = true
         hexMesh.castShadow = true
 
-        const waterLevel = 0.42
+        const waterLevel = 0.36
         const terrainHeight =
           this.noiseMap[hexGridPos.x][hexGridPos.y] < waterLevel
             ? waterLevel - 0.2
@@ -84,29 +100,48 @@ export class TerrainSystem extends System {
 
         const hex3dY = terrainHeight ** 4 * 5
 
-        if (terrainHeight > waterLevel) {
-        }
-        mainScene.add(hexMesh)
-
         hexEntity.addComponent(TranslateComponent, {
-          x: hexCoords.x - 40,
-          y: hex3dY,
-          z: hexCoords.y - 40,
+          x: hexCoords.x,
+          y: hex3dY - 5,
+          z: hexCoords.y,
         })
 
         hexEntity.addComponent(Object3DComponent, { value: hexMesh })
+
+        if (terrainHeight > waterLevel) {
+          mainScene.add(hexMesh)
+        } else {
+          hexEntity.remove()
+        }
+      }
+
+      if (mesh && counter % 5 == 0) {
+        const frustum = new Frustum()
+        frustum.setFromProjectionMatrix(
+          new Matrix4().multiplyMatrices(
+            camera.projectionMatrix,
+            camera.matrixWorldInverse
+          )
+        )
+
+        // Your 3d point to check
+        if (frustum.containsPoint(mesh.value.position)) {
+          mesh.value.parent ? null : mainScene.add(mesh.value)
+        } else {
+          mainScene.remove(mesh.value)
+        }
       }
     }
   }
 }
 
 TerrainSystem.queries = {
-  tileAdd: {
+  hexTiles: {
     components: [HexTile],
     listen: {
       added: true,
-      removed: false,
-      changed: false,
+      removed: true,
+      changed: true,
     },
   },
 }
