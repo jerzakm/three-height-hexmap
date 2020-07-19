@@ -1,5 +1,5 @@
 import { System } from 'ecsy'
-import { SceneAdd, SceneRemove } from '../../components/basic/TagComponents'
+import { SceneAdd, SceneRemove } from '../../components/TagComponents'
 import { mainScene } from '../../three'
 import { DirectionalLightComponent } from '../../components/basic/DirectionalLight'
 

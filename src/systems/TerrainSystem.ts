@@ -17,12 +17,12 @@ import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtil
 import { generateTerrain } from '../terrainGen'
 import { Position2 } from '../components/basic/Position2'
 import { Color } from '../components/basic/Color'
-import { HexTile } from '../components/basic/TagComponents'
-import { Object3DComponent } from '../components/basic/MeshComponent'
 import { mainScene, camera } from '../three'
 import { calcHexLocation } from '../hexGrid/hexMath'
 import { TranslateComponent } from '../components/TranslateComponent'
 import { worldSettings } from '../main'
+import { HexTile } from '../components/TagComponents'
+import { assets } from '../assets'
 
 const r = 1
 const h = 1 * Math.sqrt(3)
@@ -38,7 +38,7 @@ export class TerrainSystem extends System {
     const objLoader = new OBJLoader()
     this.colorMaterials = {}
     objLoader.load('hexagon.obj', (group: any) => {
-      this.hexGeometry = group.children[0].geometry
+      this.hexGeometry = assets.hexGeometry
 
       //Temporary generation here TODO move outside of terrain system
       const { noiseMap, colorMap } = generateTerrain(

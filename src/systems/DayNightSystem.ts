@@ -14,7 +14,7 @@ import { mainScene } from '../three'
 import { degToRad } from '../util/math'
 import { TimeComponent } from '../components/TimeComponent'
 import { Position3 } from '../components/basic/Position3'
-import { SunTag, SceneAdd } from '../components/basic/TagComponents'
+import { SunTag, SceneAdd } from '../components/TagComponents'
 import { DirectionalLightComponent } from '../components/basic/DirectionalLight'
 
 const sunSpeed = 0.00001

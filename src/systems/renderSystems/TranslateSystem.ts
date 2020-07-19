@@ -1,6 +1,6 @@
 import { System } from 'ecsy'
 import { TranslateComponent } from '../../components/TranslateComponent'
-import { Object3DComponent } from '../../components/basic/MeshComponent'
+import { Object3DComponent } from '../../components/basic/Object3dComponent'
 
 export class TranslateSystem extends System {
   // This method will get called on every frame by default
