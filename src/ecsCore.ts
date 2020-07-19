@@ -58,7 +58,7 @@ export const initEcsy = () => {
 function setupWorld() {
   // 1. Time entity
   const clock = world.createEntity()
-  clock.addComponent(TimeComponent, { speed: 1 })
+  clock.addComponent(TimeComponent, { speed: 2 })
 }
 
 function registerAll() {

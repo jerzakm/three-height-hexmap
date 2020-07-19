@@ -4,12 +4,13 @@ import {
   PerspectiveCamera,
   BasicShadowMap,
   GammaEncoding,
+  PCFSoftShadowMap,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 export const renderer = new WebGLRenderer({ antialias: true })
 renderer.shadowMap.enabled = true
-renderer.shadowMap.type = BasicShadowMap
+renderer.shadowMap.type = PCFSoftShadowMap
 // @ts-ignore
 renderer.outputEncoding = GammaEncoding
 renderer.setPixelRatio(window.devicePixelRatio)

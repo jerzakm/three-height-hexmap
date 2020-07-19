@@ -7,7 +7,13 @@ import {
   Frustum,
   Matrix4,
   Vector3,
+  BufferGeometry,
+  MeshBasicMaterial,
+  BufferAttribute,
+  VertexColors,
 } from 'three'
+
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { generateTerrain } from '../terrainGen'
 import { Position2 } from '../components/basic/Position2'
 import { Color } from '../components/basic/Color'
@@ -21,10 +27,9 @@ import { worldSettings } from '../main'
 const r = 1
 const h = 1 * Math.sqrt(3)
 
-let counter = 0
-
 export class TerrainSystem extends System {
   hexModel!: Mesh
+  hexGeometry!: BufferGeometry
   noiseMap!: number[][]
   colorMap!: string[][]
   colorMaterials!: any
@@ -33,104 +38,110 @@ export class TerrainSystem extends System {
     const objLoader = new OBJLoader()
     this.colorMaterials = {}
     objLoader.load('hexagon.obj', (group: any) => {
-      this.hexModel = group.children[0]
-    })
+      this.hexGeometry = group.children[0].geometry
 
-    //Temporary generation here TODO move outside of terrain system
-    const { noiseMap, colorMap } = generateTerrain(
-      worldSettings.width,
-      worldSettings.height
-    )
-    this.colorMap = colorMap
-    this.noiseMap = noiseMap
+      //Temporary generation here TODO move outside of terrain system
+      const { noiseMap, colorMap } = generateTerrain(
+        worldSettings.width,
+        worldSettings.height
+      )
+      this.colorMap = colorMap
+      this.noiseMap = noiseMap
 
-    for (let x = 0; x < noiseMap.length; x++) {
-      for (let y = 0; y < noiseMap[0].length; y++) {
-        const hexEntity = this.world.createEntity(`${x}:${y}`)
-        hexEntity.addComponent(Position2, { value: new Vector2(x, y) })
-        hexEntity.addComponent(Color, { value: colorMap[x][y] })
-        hexEntity.addComponent(HexTile)
+      const geometries: BufferGeometry[] = []
+
+      const hexHelper = new Mesh(
+        this.hexGeometry,
+        new MeshBasicMaterial({ color: 'yellow', wireframe: true })
+      )
+
+      const groupSize = 16
+
+      for (
+        let groupX = 0;
+        groupX < Math.ceil(noiseMap.length / groupSize);
+        groupX++
+      ) {
+        for (
+          let groupY = 0;
+          groupY < Math.ceil(noiseMap.length / groupSize);
+          groupY++
+        ) {}
       }
-    }
+
+      for (let x = 0; x < noiseMap.length; x++) {
+        for (let y = 0; y < noiseMap[0].length; y++) {
+          const hexEntity = this.world.createEntity(`${x}:${y}`)
+          hexEntity.addComponent(Position2, { value: new Vector2(x, y) })
+          hexEntity.addComponent(Color, { value: colorMap[x][y] })
+          hexEntity.addComponent(HexTile)
+
+          const waterLevel = 0.36
+          const terrainHeight =
+            this.noiseMap[x][y] < waterLevel
+              ? waterLevel - 0.2
+              : this.noiseMap[x][y]
+
+          const hex3dY = terrainHeight ** 4 * 5
+
+          const hexCoords = calcHexLocation(x, y, r, h, false)
+          hexHelper.position.set(hexCoords.x, hex3dY - 5, hexCoords.y)
+
+          if (terrainHeight > waterLevel) {
+            const geometry = this.hexGeometry.clone()
+
+            const c = Math.random() * 255
+            const rgb = [c, c, c]
+
+            // make an array to store colors for each vertex
+            const numVerts = geometry.getAttribute('position').count
+            const itemSize = 3 // r, g, b
+            const colors = new Uint8Array(itemSize * numVerts)
+
+            // copy the color into the colors array for each vertex
+            colors.forEach((v, ndx) => {
+              colors[ndx] = rgb[ndx % 3]
+            })
+
+            const normalized = true
+            const colorAttrib = new BufferAttribute(
+              colors,
+              itemSize,
+              normalized
+            )
+            geometry.setAttribute('color', colorAttrib)
+
+            hexHelper.updateWorldMatrix(true, false)
+            geometry.applyMatrix4(hexHelper.matrixWorld)
+
+            geometries.push(geometry)
+          }
+        }
+      }
+
+      console.log(geometries)
+
+      const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+        geometries,
+        false
+      )
+      const material = new MeshPhongMaterial({
+        //@ts-ignore
+        vertexColors: VertexColors,
+      })
+      const mesh = new Mesh(mergedGeometry, material)
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      mainScene.add(mesh)
+    })
   }
 
   execute(delta: any, time: any) {
     // Tile gets added for the first time
     // camera.updateMatrix()
     // camera.updateMatrixWorld()
-    counter++
     for (let i = 0; i < this.queries.hexTiles.results.length; i++) {
       const hexEntity = this.queries.hexTiles.results[i]
-      const mesh = hexEntity.getComponent(Object3DComponent)
-
-      if (!mesh && this.hexModel) {
-        const hexGridPos = hexEntity.getComponent(Position2).value
-        const color = hexEntity.getComponent(Color).value
-
-        let material
-
-        if (this.colorMaterials[`${color}`]) {
-          material = this.colorMaterials[`${color}`]
-        } else {
-          this.colorMaterials[`${color}`] = new MeshPhongMaterial({
-            color,
-          })
-        }
-
-        const hexMesh = new Mesh(
-          this.hexModel.geometry,
-          this.colorMaterials[`${color}`]
-        )
-        const hexCoords = calcHexLocation(
-          hexGridPos.x,
-          hexGridPos.y,
-          r,
-          h,
-          false
-        )
-        hexMesh.position.set(hexCoords.x, 0, hexCoords.y)
-        hexMesh.receiveShadow = true
-        hexMesh.castShadow = true
-
-        const waterLevel = 0.36
-        const terrainHeight =
-          this.noiseMap[hexGridPos.x][hexGridPos.y] < waterLevel
-            ? waterLevel - 0.2
-            : this.noiseMap[hexGridPos.x][hexGridPos.y]
-
-        const hex3dY = terrainHeight ** 4 * 5
-
-        hexEntity.addComponent(TranslateComponent, {
-          x: hexCoords.x,
-          y: hex3dY - 5,
-          z: hexCoords.y,
-        })
-
-        hexEntity.addComponent(Object3DComponent, { value: hexMesh })
-
-        if (terrainHeight > waterLevel) {
-          mainScene.add(hexMesh)
-        } else {
-          hexEntity.remove()
-        }
-      }
-
-      if (mesh && counter % 5 == 0) {
-        const frustum = new Frustum()
-        frustum.setFromProjectionMatrix(
-          new Matrix4().multiplyMatrices(
-            camera.projectionMatrix,
-            camera.matrixWorldInverse
-          )
-        )
-
-        // Your 3d point to check
-        if (frustum.containsPoint(mesh.value.position)) {
-          mesh.value.parent ? null : mainScene.add(mesh.value)
-        } else {
-          mainScene.remove(mesh.value)
-        }
-      }
     }
   }
 }
@@ -139,8 +150,8 @@ TerrainSystem.queries = {
   hexTiles: {
     components: [HexTile],
     listen: {
-      added: true,
-      removed: true,
+      added: false,
+      removed: false,
       changed: true,
     },
   },

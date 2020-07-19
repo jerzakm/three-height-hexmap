@@ -33,8 +33,8 @@ export class DayNightSystem extends System {
     sunLight.position.set(-1, 0.75, 1)
     sunLight.position.multiplyScalar(50)
     sunLight.castShadow = true
-    sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 4096 * 100
-    const d = 300
+    sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 4096 * 64
+    const d = 350
     sunLight.shadow.camera.left = -d
     sunLight.shadow.camera.right = d
     sunLight.shadow.camera.top = d
