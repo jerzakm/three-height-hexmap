@@ -256,8 +256,8 @@ export class WaterSystem extends System {
   // This method will get called on every frame by default
   init() {
     const plane = new PlaneBufferGeometry(
-      worldSettings.width * Math.sqrt(3) + 4,
-      worldSettings.height * 1.5 + 4
+      worldSettings.width * Math.sqrt(3) * 3 + 4,
+      worldSettings.height * 1.5 * 3 + 4
     )
     const material = new ShaderMaterial({
       fragmentShader,
