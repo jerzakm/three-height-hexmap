@@ -27,20 +27,20 @@ export class DayNightSystem extends System {
 
   init() {
     // configure sun light
-    const sunLight = new DirectionalLight(0xffffcc, 0.25)
+    const sunLight = new DirectionalLight(0xffffcc, 0.28)
 
     sunLight.name = 'dirlight'
     sunLight.position.set(-1, 0.75, 1)
     sunLight.position.multiplyScalar(50)
     sunLight.castShadow = true
-    sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 4096 * 64
+    sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 4096 * 32
     const d = 350
     sunLight.shadow.camera.left = -d
     sunLight.shadow.camera.right = d
     sunLight.shadow.camera.top = d
     sunLight.shadow.camera.bottom = -d
 
-    sunLight.shadow.camera.far = 3500
+    sunLight.shadow.camera.far = 9000
     sunLight.shadow.bias = 0.00001
 
     // Create sun

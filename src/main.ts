@@ -11,8 +11,8 @@ const app = new App({
 })
 
 export const worldSettings = {
-  width: 64,
-  height: 64,
+  width: 32 * 32,
+  height: 32 * 32,
 }
 
 async function start() {

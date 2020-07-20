@@ -76,7 +76,7 @@ export class TerrainSystem extends System {
           hexEntity.addComponent(Color, { value: colorMap[x][y] })
           hexEntity.addComponent(HexTile)
 
-          const waterLevel = 0.36
+          const waterLevel = 0.5
           const terrainHeight =
             this.noiseMap[x][y] < waterLevel
               ? waterLevel - 0.2

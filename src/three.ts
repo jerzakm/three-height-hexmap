@@ -7,6 +7,7 @@ import {
   PCFSoftShadowMap,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { worldSettings } from './main'
 
 export const renderer = new WebGLRenderer({ antialias: true })
 renderer.shadowMap.enabled = true
@@ -25,7 +26,7 @@ export const camera = new PerspectiveCamera(
   2000
 )
 
-camera.position.set(20, 50, 20) // all components equal
+camera.position.set(1, 70, 1) // all components equal
 camera.lookAt(mainScene.position) // or the origin
 
 const controls = new OrbitControls(camera, renderer.domElement)

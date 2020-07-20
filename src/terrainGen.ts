@@ -4,13 +4,13 @@ import { inverseLerp } from './util/math'
 import { Vector2 } from 'three'
 
 const regions: TerrainType[] = []
-regions.push({ name: 'water', height: 0.3, colour: '#1133AA' })
-regions.push({ name: 'waterShallow', height: 0.35, colour: '#2255BB' })
-regions.push({ name: 'sand', height: 0.42, colour: '#CCDD22' })
-regions.push({ name: 'grass', height: 0.55, colour: '#44BC11' })
-regions.push({ name: 'grass2', height: 0.6, colour: '#44DC11' })
-regions.push({ name: 'rock', height: 0.85, colour: '#559911' })
-regions.push({ name: 'rock2', height: 0.95, colour: '#342111' })
+regions.push({ name: 'water', height: 0.45, colour: '#1133AA' })
+regions.push({ name: 'waterShallow', height: 0.5, colour: '#2255BB' })
+regions.push({ name: 'sand', height: 0.52, colour: '#CCDD22' })
+regions.push({ name: 'grass', height: 0.68, colour: '#44BC11' })
+regions.push({ name: 'grass2', height: 0.75, colour: '#44DC11' })
+regions.push({ name: 'rock', height: 0.9, colour: '#559911' })
+regions.push({ name: 'rock2', height: 0.98, colour: '#342111' })
 regions.push({ name: 'mountain', height: 1, colour: '#EEEEEE' })
 
 interface TerrainType {

@@ -8,6 +8,10 @@ import {
   BufferAttribute,
   VertexColors,
   Color,
+  Vector3,
+  BoxGeometry,
+  Frustum,
+  Matrix4,
 } from 'three'
 
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
@@ -31,6 +35,8 @@ const hexHelper = new Mesh(
   new MeshBasicMaterial({ color: 'yellow', wireframe: true })
 )
 
+let counter = 0
+
 export class NewTerrainSystem extends System {
   hexModel!: Mesh
   noiseMap!: number[][]
@@ -48,14 +54,15 @@ export class NewTerrainSystem extends System {
     this.colorMap = colorMap
     this.noiseMap = noiseMap
 
-    const groupSize = 16
+    const groupSize = 32
     const groupsQtyX = Math.ceil(worldSettings.width / groupSize)
     const groupsQtyY = Math.ceil(worldSettings.height / groupSize)
     const hexHelper = new Mesh(
       assets.hexGeometry,
       new MeshBasicMaterial({ color: 'yellow', wireframe: true })
     )
-    // Loop over mesh groups
+
+    // Loop hex groups
     for (let groupX = 0; groupX < groupsQtyX; groupX++) {
       for (let groupY = 0; groupY < groupsQtyY; groupY++) {
         const hexGroupEntity = this.world.createEntity(
@@ -63,18 +70,18 @@ export class NewTerrainSystem extends System {
         )
 
         const hexRenderData: IHexRenderData[] = []
-
         // loop over single tiles in a group
+        const bounds: Vector3[] = []
         for (let gX = 0; gX < groupSize; gX++) {
           for (let gY = 0; gY < groupSize; gY++) {
             const x = groupX * groupSize + gX
             const y = groupY * groupSize + gY
-            const waterLevel = 0.36
+            const waterLevel = 0.5
             const terrainHeight =
               this.noiseMap[x][y] < waterLevel
                 ? waterLevel - 0.2
                 : this.noiseMap[x][y]
-            const hex3dY = terrainHeight ** 4 * 5
+            const hex3dY = terrainHeight ** 7 * 10
             const hexCoords = calcHexLocation(x, y, r, h, false)
 
             if (terrainHeight > waterLevel) {
@@ -85,23 +92,71 @@ export class NewTerrainSystem extends System {
                 color: this.colorMap[x][y],
               })
             }
+
+            if (
+              gX == 0 ||
+              gY == 0 ||
+              gY == groupSize - 1 ||
+              gY == groupSize - 1
+            ) {
+              bounds.push(new Vector3(hexCoords.x, hex3dY - 5, hexCoords.y))
+            }
           }
         }
 
-        hexGroupEntity.addComponent(HexRenderData, { data: hexRenderData })
+        hexGroupEntity.addComponent(HexRenderData, {
+          data: hexRenderData,
+          bounds,
+        })
       }
     }
   }
 
   execute(delta: any, time: any) {
+    counter++
+    camera.updateMatrix()
+    camera.updateMatrixWorld()
+
+    const frustum = new Frustum()
+    frustum.setFromProjectionMatrix(
+      new Matrix4().multiplyMatrices(
+        camera.projectionMatrix,
+        camera.matrixWorldInverse
+      )
+    )
+
+    const startTime = Date.now()
+
     const hexGroups = this.queries.hexGroup.results
     for (const hexGroup of hexGroups) {
-      const hexData = hexGroup.getComponent(HexRenderData).data
+      const hexData = hexGroup.getComponent(HexRenderData)
       // check if the mesh has been generated
       const hasMesh = hexGroup.hasComponent(Object3DComponent)
-      if (!hasMesh) {
+
+      // Your 3d point to check
+      let inView = false
+      for (const bound of hexData.bounds) {
+        const buffer = 2
+
+        for (let i = 0; i < 6; i++) {
+          if (frustum.planes[i].distanceToPoint(bound) > 0 - buffer) {
+            inView = true
+          }
+        }
+
+        // if (frustum.containsPoint(bound)) {
+        //   inView = true
+        // }
+      }
+
+      if (!hasMesh && inView) {
+        const currTime = Date.now()
+        const diff = currTime - startTime
+        if (diff > 10) {
+          break
+        }
         const groupGeometries: BufferGeometry[] = []
-        for (const hex of hexData) {
+        for (const hex of hexData.data) {
           hexHelper.position.set(hex.x, hex.y, hex.z)
           const geometry = assets.hexGeometry.clone()
           const c = new Color(hex.color)
@@ -137,6 +192,15 @@ export class NewTerrainSystem extends System {
           // mesh.receiveShadow = true
           mainScene.add(mesh)
           hexGroup.addComponent(Object3DComponent, { value: mesh })
+        }
+      } else if (hasMesh && counter % 5 == 0) {
+        const mesh = hexGroup.getComponent(Object3DComponent).value
+        if (inView) {
+          if (!mesh.parent) {
+            mainScene.add(mesh)
+          }
+        } else if (!inView && mesh.parent) {
+          mainScene.remove(mesh)
         }
       }
     }
