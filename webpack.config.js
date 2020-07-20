@@ -5,8 +5,12 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const path = require('path');
 
-const mode = process.env.NODE_ENV || 'development';
-const prod = mode === 'production';
+// const mode = process.env.NODE_ENV || 'development';
+// const prod = mode === 'production';
+
+// temp fix for build.. TODO optimize building for prod
+const mode = 'development';
+const prod = false;
 
 module.exports = {
   entry: {
