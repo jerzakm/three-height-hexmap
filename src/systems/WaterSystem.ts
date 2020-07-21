@@ -10,7 +10,12 @@ import {
   UniformsLib,
 } from 'three'
 import { degToRad } from '../util/math'
-import { worldSettings } from '../main'
+import { worldSettingsStore } from '../stores'
+
+let worldSettings
+worldSettingsStore.subscribe((ws) => {
+  worldSettings = ws
+})
 // TODO optimize shader
 const fragmentShader = `
 #include <common>

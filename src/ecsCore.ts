@@ -16,7 +16,6 @@ import {
 import { SceneManagerSystem } from './systems/renderSystems/SceneManagerSystem'
 import { DirectionalLightComponent } from './components/basic/DirectionalLight'
 import { Object3DComponent } from './components/basic/Object3dComponent'
-import { TerrainSystem } from './systems/TerrainSystem'
 import { Position2 } from './components/basic/Position2'
 import { Color } from './components/basic/Color'
 import { TranslateSystem } from './systems/renderSystems/TranslateSystem'
@@ -58,13 +57,6 @@ export const initEcsy = () => {
   world = new World()
   registerAll()
   run()
-  setupWorld()
-}
-
-function setupWorld() {
-  // 1. Time entity
-  const clock = world.createEntity()
-  clock.addComponent(TimeComponent, { speed: 2 })
 }
 
 function registerAll() {

@@ -1,10 +1,13 @@
 import { System } from 'ecsy'
 import { TimeComponent } from '../components/TimeComponent'
-import { timeStore } from '../gui/stores'
+import { timeStore } from '../stores'
 
 export class TimeSystem extends System {
   // This method will get called on every frame by default
-  init() {}
+  init() {
+    const clock = this.world.createEntity()
+    clock.addComponent(TimeComponent, { speed: 2 })
+  }
 
   execute(delta: any, time: any) {
     this.queries.time.results.forEach((entity) => {

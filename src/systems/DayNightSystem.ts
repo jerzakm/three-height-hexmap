@@ -16,8 +16,14 @@ import { TimeComponent } from '../components/TimeComponent'
 import { Position3 } from '../components/basic/Position3'
 import { SunTag, SceneAdd } from '../components/TagComponents'
 import { DirectionalLightComponent } from '../components/basic/DirectionalLight'
+import { worldSettingsStore } from '../stores'
 
 const sunSpeed = 0.00001
+let worldSettings
+
+worldSettingsStore.subscribe((ws) => {
+  worldSettings = ws
+})
 
 export class DayNightSystem extends System {
   // This method will get called on every frame by default
@@ -71,8 +77,6 @@ export class DayNightSystem extends System {
   }
 
   execute(delta: any, time: any) {
-    const sunTravelRadius = 150
-
     const sun = this.queries.sun.results[0]
 
     this.queries.time.results.forEach((timeEntity) => {
@@ -80,8 +84,9 @@ export class DayNightSystem extends System {
 
       const angle = degToRad(360 * dayProgress)
 
-      const x = Math.cos(angle) * sunTravelRadius
-      const y = Math.sin(angle) * sunTravelRadius
+      const x =
+        (Math.cos(angle) * worldSettings.width) / 2 + worldSettings.width
+      const y = (Math.sin(angle) * worldSettings.width) / 2
 
       const sunPosition = sun.getMutableComponent(Position3)
       sunPosition.value.set(x, y, 150)
@@ -92,13 +97,12 @@ export class DayNightSystem extends System {
           // sun brigthens up
           // @ts-ignore
           this.ambient.intensity += delta * sunSpeed * 2
-
           // sun is red in the morning
           sunLight.value.intensity = dayProgress + 0.35
           sunLight.value.color = new Color(
-            `rgb(255,${(255 * (dayProgress + 0.4)).toFixed(0)},${(
-              255 * dayProgress +
-              0.4
+            `rgb(255,${(255 * (dayProgress + 0.6)).toFixed(0)},${(
+              255 *
+              (dayProgress + 0.6)
             ).toFixed(0)})`
           )
         } else {
@@ -109,7 +113,10 @@ export class DayNightSystem extends System {
       } else {
         // reset to 0 - night
         // @ts-ignore
-        this.ambient.intensity = 0.005
+        this.ambient.intensity = 0.001
+        sunLight.value.intensity > 0
+          ? (sunLight.value.intensity -= delta / 10)
+          : 0
       }
 
       sunLight.value.position.x = sunPosition.value.x

@@ -10,11 +10,6 @@ const app = new App({
   target: document.body,
 })
 
-export const worldSettings = {
-  width: 32 * 32,
-  height: 32 * 32,
-}
-
 async function start() {
   await loadAssets()
   initScene()

@@ -7,7 +7,6 @@ import {
   PCFSoftShadowMap,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { worldSettings } from './main'
 
 export const renderer = new WebGLRenderer({ antialias: true })
 renderer.shadowMap.enabled = true

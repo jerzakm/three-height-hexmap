@@ -1,5 +1,4 @@
 import { System } from 'ecsy'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import {
   Mesh,
   MeshPhongMaterial,
@@ -16,19 +15,24 @@ import {
 
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { generateTerrain } from '../terrainGen'
-import { Position2 } from '../components/basic/Position2'
 
-import { HexTile, HexGroup } from '../components/TagComponents'
 import { Object3DComponent } from '../components/basic/Object3dComponent'
 import { mainScene, camera } from '../three'
 import { calcHexLocation } from '../hexGrid/hexMath'
-import { TranslateComponent } from '../components/TranslateComponent'
-import { worldSettings } from '../main'
+
 import { assets } from '../assets'
 import { HexRenderData, IHexRenderData } from '../components/HexRenderData'
+import { worldSettingsStore, meshGroupsRendered } from '../stores'
 
 const r = 1
 const h = 1 * Math.sqrt(3)
+
+let worldSettings
+let meshRenderStats
+
+worldSettingsStore.subscribe((ws) => {
+  worldSettings = ws
+})
 
 const hexHelper = new Mesh(
   assets.hexGeometry,
@@ -36,6 +40,9 @@ const hexHelper = new Mesh(
 )
 
 let counter = 0
+
+const redMat = new MeshBasicMaterial({ color: '#121212' })
+const whiteMat = new MeshBasicMaterial({ color: '#FFFFFF' })
 
 export class NewTerrainSystem extends System {
   hexModel!: Mesh
@@ -54,13 +61,10 @@ export class NewTerrainSystem extends System {
     this.colorMap = colorMap
     this.noiseMap = noiseMap
 
-    const groupSize = 32
+    const groupSize = worldSettings.meshGroupSize
+
     const groupsQtyX = Math.ceil(worldSettings.width / groupSize)
     const groupsQtyY = Math.ceil(worldSettings.height / groupSize)
-    const hexHelper = new Mesh(
-      assets.hexGeometry,
-      new MeshBasicMaterial({ color: 'yellow', wireframe: true })
-    )
 
     // Loop hex groups
     for (let groupX = 0; groupX < groupsQtyX; groupX++) {
@@ -126,8 +130,8 @@ export class NewTerrainSystem extends System {
     )
 
     const startTime = Date.now()
-
     const hexGroups = this.queries.hexGroup.results
+
     for (const hexGroup of hexGroups) {
       const hexData = hexGroup.getComponent(HexRenderData)
       // check if the mesh has been generated
@@ -136,17 +140,22 @@ export class NewTerrainSystem extends System {
       // Your 3d point to check
       let inView = false
       for (const bound of hexData.bounds) {
-        const buffer = 2
+        const buffer = 0
 
-        for (let i = 0; i < 6; i++) {
-          if (frustum.planes[i].distanceToPoint(bound) > 0 - buffer) {
-            inView = true
-          }
-        }
+        // for (let i = 0; i < 6; i++) {
+        //   const fDist: any = frustum.planes[i].distanceToPoint(bound)
+        //   if (fDist < 0 - buffer) {
+        //     inView = true
+        //   }
+        // }
 
         // if (frustum.containsPoint(bound)) {
         //   inView = true
         // }
+
+        if (frustumContainsPoint(frustum, bound, buffer)) {
+          inView = true
+        }
       }
 
       if (!hasMesh && inView) {
@@ -193,8 +202,11 @@ export class NewTerrainSystem extends System {
           mainScene.add(mesh)
           hexGroup.addComponent(Object3DComponent, { value: mesh })
         }
-      } else if (hasMesh && counter % 5 == 0) {
-        const mesh = hexGroup.getComponent(Object3DComponent).value
+      } else if (hasMesh && counter % 1 == 0) {
+        if (counter % 20 == 0) {
+          meshGroupsRendered.set(mainScene.children.length - 4)
+        }
+        const mesh = hexGroup.getMutableComponent(Object3DComponent).value
         if (inView) {
           if (!mesh.parent) {
             mainScene.add(mesh)
@@ -216,4 +228,14 @@ NewTerrainSystem.queries = {
       changed: true,
     },
   },
+}
+
+function frustumContainsPoint(frustum: Frustum, point: Vector3, buffer = 0) {
+  for (let i = 0; i < 6; i++) {
+    if (frustum.planes[i].distanceToPoint(point) < 0 - buffer) {
+      return false
+    }
+  }
+
+  return true
 }
